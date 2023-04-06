@@ -1,0 +1,8 @@
+/my_env/**
+.DS_Store
+.RData
+.Renviron
+.Rhistory
+.gitignore
+entites_nommees_python.qmd
+/code_files/**
