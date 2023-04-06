@@ -81,14 +81,11 @@ extensions <-
     "data.table",
     "tidygeocoder",
     "sf",
-    "dplyr",
     "stringi",
-    "mapview",
     "stringr",
     "tmap",
     "tmaptools",
-    "viridis",
-    "spData"
+    "viridis"
   )
 
 inst_ext_fun(extensions)
@@ -393,19 +390,24 @@ L'extension tmap fonctionne sur le principe de la grammaire des graphiques dont 
 tmap_mode("plot")
 
 # Fonction de base, à laquelle on ajoute les polygones
-tm_shape(freq_quartiers_geo) + tm_polygons(col = "N",  palette = "viridis")
+tm_shape(freq_quartiers_geo) + tm_fill(col = "N",  palette = "viridis") +
+  tm_layout(legend.height = 0.5)
 
 # Avec des tranches
-tm_shape(freq_quartiers_geo) + tm_polygons(col = "N", breaks = c(0,3,5), palette = "viridis")
+tm_shape(freq_quartiers_geo) + tm_polygons(col = "N", breaks = c(0,3,5), palette = "viridis") +
+  tm_layout(legend.height = 0.5)
 
 # Avec algorithme (jenks = identification des groupes similaires)
-tm_shape(freq_quartiers_geo) + tm_polygons(col = "N", style = "jenks", palette = "viridis")
+tm_shape(freq_quartiers_geo) + tm_polygons(col = "N", style = "jenks", palette = "viridis") +
+  tm_layout(legend.height = 0.5)
 
 # Avec une seule couleur par catégorie
-tm_shape(freq_quartiers_geo) + tm_polygons(col = "N", style = "cat", palette = "viridis")
+tm_shape(freq_quartiers_geo) + tm_polygons(col = "N", style = "cat", palette = "viridis") +
+  tm_layout(legend.height = 0.5)
 
 # Ajout de composantes graphiques (boussole, titres, etc.)
-freq_shape <- tm_shape(freq_quartiers_geo) + tm_polygons(col = "N", style = "cat", palette = "viridis")
+freq_shape <- tm_shape(freq_quartiers_geo) + tm_polygons(col = "N", style = "cat", palette = "viridis") +
+  tm_layout(legend.height = 0.5)
 
 # Ajout d'une boussole
 freq_shape + tm_compass(type = "8star", position = c("left", "top"))
@@ -525,6 +527,9 @@ freq_univ_geo <- freq_univ |> tidygeocoder::geocode(address = adresse, method = 
 
 # Transformation du tableau de données en objet Simple Feature
 freq_univ_geo_sf <- st_as_sf(freq_univ_geo, coords = c("long", "lat"), crs = st_crs(4326))
+
+# Si le géoréférencement échoue, vous pouvez exécuter l'instruction ci-dessous
+# freq_univ_geo_sf <- readRDS("donnees/donnees_produites/rds/freq_univ_geo_sf.RDS")
 ```
 
 Les coordonnées du polygone de l'île de Montréal pourront nous être utilisées pour créer une couche sur laquelle les points seront déposés.
