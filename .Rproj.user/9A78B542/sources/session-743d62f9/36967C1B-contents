@@ -533,20 +533,26 @@ tmap_mode("view")
 tm_shape(mtl_poly) + tm_polygons() +
 tm_shape(freq_univ_geo_sf) + tm_bubbles(size = "N", col = "red")
 
-tmap_mode("plot")
-tm_basemap(server = "Stamen.Toner") + 
-tm_shape(mtl_poly) + tm_polygons() +
+tmap_mode("view")
+(mtl_univ_plot <- # tm_basemap(server = "Stamen.Toner") + 
+tm_shape(mtl_poly) + tm_polygons(col="white", border.col = "blue") +
 tm_shape(freq_univ_geo_sf) + tm_bubbles(size = "N", col = "red", scale = 3)+
 # tm_text(text = "nom_univ", size = 0.5)+
 tm_credits("Source des données: Revue XYZ") + 
 tm_layout(main.title = "Universités montréalaises dans\nles nouvelles de la revue XYZ",
             fontface = "bold",
-          title.size = 0.5)
+          title.size = 0.5))
 
+# Fonction de sauvegarde
+tmap_save(
+  tm = mtl_univ_plot,
+  filename = "donnees/donnees_produites/graphiques/mtl_univ_plot.png"
+)
 
 # Exercice:
 # Modifiez l'échelle et la couleur des bulles
 # Modifiez les modes de visualisation ("plot", "view")
+
 
 ```
 
