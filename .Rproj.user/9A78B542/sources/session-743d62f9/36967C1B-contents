@@ -9,7 +9,7 @@ editor_options:
 
 # Introduction
 
-Produire une carte à partir d'un jeu de données trouvé en ligne est généralement une opération assez simple. Quelques lignes de code peuvent parfois suffire, comme le montre l'exemple ci-dessous mettant à profit un jeu de données sur les crimes commis sur le territoire montréalais:
+Produire une carte à partir d'un jeu de données trouvé en ligne est généralement une opération assez simple. Quelques lignes de code peuvent parfois suffire, comme le montre l'exemple ci-dessous mettant à profit un jeu de données sur les crimes commis sur le territoire montréalais (l'importation du jeu de données peut prendre jusqu'à quelques minutes, selon la vitesse de votre connexion internet) :
 
 ```{r}
 if(!"geojsonsf" %in% rownames(installed.packages())) {install.packages("geojsonsf")}
@@ -21,6 +21,7 @@ library(dplyr)
 library(mapview)
 
 # Importation d'un fichier comportant les coordonnées géographiques de crimes commis à Montréal
+# Élimination à la volée des données non pourvues de coordonnées, puis sélection aléatoire d'un échantillon de 500 observations
 geo <- geojson_sf("https://data.montreal.ca/dataset/5829b5b0-ea6f-476f-be94-bc2b8797769a/resource/aacc4576-97b3-4d8d-883d-22bbca41dbe6/download/actes-criminels.geojson") |>
   filter(!is.na(LONGITUDE)) |> 
   slice_sample(n=500)
@@ -32,11 +33,11 @@ mapview(geo["CATEGORIE"])
 
 On arrive, avec très peu de moyens, à produire grâce à l'extension mapview une carte interactive d'une très grande qualité.
 
-Il faut dire que R possède des extensions très puissantes et de très grande qualité, développées, soutenues et utilisées par les géographes.
+Il faut dire que R possède des extensions de grande qualité développées, soutenues et utilisées par les géographes.
 
-Si vous possédez un jeu de données qui comporte les coordonnées géographiques d'objets du monde réel et que ce jeu répond aux standards du Simple Feature Access (*SF*), le passage vers la carte sera pratiquement un jeu d'enfant. Vous trouverez en ligne quantité de tutoriels qui vous montreront à utiliser les fonctions de l'une ou l'autre des extentions spécialisées.
+Si vous possédez un jeu de données qui comporte les coordonnées géographiques d'objets du monde réel et que ce jeu répond aux standards *Simple Feature Access* (*SF*), le passage vers la représentation cartographique sera pratiquement un jeu d'enfant. Vous trouverez en ligne quantité de cours et de tutoriels qui vous montreront à utiliser les fonctions de l'une ou l'autre des extentions spécialisées.
 
-L'objectif de l'atelier n'est pas d'ajouter à cette documentation abondante et dans plusieurs cas de grande qualité. Plutôt, il vise à faire le pont entre l'analyse des données textuelles et les extensions spécialisées. En ce sens, il prend le problème en amont de l'exercice cartographique et veut proposer une chaîne de traitement possible pour passer des données textuelles aux cartes géographiques.
+L'objectif de l'atelier n'est pas d'ajouter à cette documentation abondante et dans plusieurs cas de grande qualité. Plutôt, il **vise à faire le pont entre l'analyse des données textuelles et les extensions spécialisées**. Même si l'exercice débouchera, deux fois plutôt qu'une, sur la création de cartes géographiques, l'atelier prend le problème en amont de l'exercice cartographique et veut proposer une chaîne de traitement possible pour passer des données textuelles aux cartes géographiques.
 
 ### Objectifs:
 
@@ -534,7 +535,7 @@ tm_shape(mtl_poly) + tm_polygons() +
 tm_shape(freq_univ_geo_sf) + tm_bubbles(size = "N", col = "red")
 
 tmap_mode("view")
-(mtl_univ_plot <- # tm_basemap(server = "Stamen.Toner") + 
+(mtl_univ_plot <- tm_basemap(server = "Stamen.TonerLite") + 
 tm_shape(mtl_poly) + tm_polygons(col="white", border.col = "blue") +
 tm_shape(freq_univ_geo_sf) + tm_bubbles(size = "N", col = "red", scale = 3)+
 # tm_text(text = "nom_univ", size = 0.5)+
@@ -552,6 +553,7 @@ tmap_save(
 # Exercice:
 # Modifiez l'échelle et la couleur des bulles
 # Modifiez les modes de visualisation ("plot", "view")
+# La fonction `tm_basemap()` permet d'importer des toiles de fond variées. Remplacez "Stamen.Toner" par "Stamen.Watercolor" ou "Esri.WorldImagery". D'autres options sont proposées https://leaflet-extras.github.io/leaflet-providers/preview/
 
 
 ```
