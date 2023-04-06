@@ -37,7 +37,7 @@ Il faut dire que R possède des extensions de grande qualité développées, sou
 
 Si vous possédez un jeu de données qui comporte les coordonnées géographiques d'objets du monde réel et que ce jeu répond aux standards *Simple Feature Access* (*SF*), le passage vers la représentation cartographique sera pratiquement un jeu d'enfant. Vous trouverez en ligne quantité de cours et de tutoriels qui vous montreront à utiliser les fonctions de l'une ou l'autre des extentions spécialisées.
 
-L'objectif de l'atelier n'est pas d'ajouter à cette documentation abondante et dans plusieurs cas de grande qualité. Plutôt, il **vise à faire le pont entre l'analyse des données textuelles et les extensions spécialisées**. Même si l'exercice débouchera, deux fois plutôt qu'une, sur la création de cartes géographiques, l'atelier prend le problème en amont de l'exercice cartographique et veut proposer une chaîne de traitement possible pour passer des données textuelles aux cartes géographiques.
+L'objectif de l'atelier n'est pas d'ajouter à cette documentation abondante et dans plusieurs cas de grande qualité. Plutôt, il **vise à faire le pont entre l'analyse des données textuelles et les extensions spécialisées**. Même si l'exercice débouchera, deux fois plutôt qu'une, sur la création de cartes géographiques, on veut prendre le problème en amont de l'exercice cartographique en proposant une chaîne de traitement possible pour passer des données textuelles aux cartes géographiques.
 
 ### Objectifs:
 
@@ -45,7 +45,7 @@ L'objectif de l'atelier n'est pas d'ajouter à cette documentation abondante et 
 
 -   obtenir par croisement de tables et par API (tidygeocoder) les coordonnées géographiques de ces objets;
 
--   projeter le résultat sur une carte.
+-   projeter les résultats sur des carte.
 
 Nous allons essayer d'atteindre ces objectifs à travers deux tâches plus précises.
 
@@ -55,7 +55,7 @@ La première tâche consistera à extraire de textes de fictions les noms de qua
 
 #### Deuxième tâche
 
-La deuxième tâche consistera à extraire du même corpus les mentions des universités montréalaises, à géoréférencer ces universitiés avec tidygeocoder, puis à projeter sur une carte géographique les points correspondant à ces entités géographiques.
+La deuxième tâche consistera à extraire du même corpus les mentions des universités montréalaises, à géoréférencer ces universitiés avec tidygeocoder, puis à projeter sur une carte géographique les points correspondant à ces objets.
 
 ## Installation et activation des extensions
 
@@ -99,14 +99,13 @@ inst_ext_fun(extensions)
 
 ## Importation et préparation des données
 
-Le jeu de données que nous allons utiliser est celui qui a été exploré dans les précédents ateliers. Il s'agit d'un tableau de données (*data frame*) contenant 563 nouvelles littéraires publiées dans la revue XYZ entre 2012 et 2022. Les textes ont été moissonnés sur le site [Érudit](https://www.erudit.org/fr/revues/xyz/) par l'équipe du LADIREC (Amélie Ducharme et Yu Chen Shi, sous la supervision de Julien Vallières-Gingras).
+Le jeu de données que nous allons utiliser est celui qui a été exploré dans les précédents ateliers. Il s'agit d'un tableau de données (*data frame*) contenant 563 nouvelles littéraires publiées dans [XYZ: la revue de la nouvelle](https://www.erudit.org/fr/revues/xyz/) entre 2012 et 2022. Les textes ont été moissonnés sur le site [Érudit](https://www.erudit.org/fr/revues/xyz/) par l'équipe du LADIREC (Amélie Ducharme et Yu Chen Shi, sous la supervision de Julien Vallières-Gingras).
 
 ```{r}
 
 # Lecture du jeu de données
 xyz <-
   data.table::fread("donnees/donnees_importees/combined_table_xyz.csv")
-table(xyz$Date)
 
 # Observer la structure
 str(xyz)
@@ -122,10 +121,15 @@ xyz$doc_id <-
 # Vérifier que les doc_id sont uniques
 table(!duplicated(xyz$doc_id))
 
-# Observer la structure
+# Autre manière de faire cette vérification:
+identical(length(xyz$doc_id), nrow(xyz))
+
+# Exercice: pouvez-vous expliquer l'instruction ci-dessus?
+
+# Observer à nouveau la structure
 str(xyz)
 
-# La variable "Date" contient l'année. On peut extraire cette information
+# La variable "Date" contient l'année. On peut extraire cette information et l'emmagasiner dans une nouvelle colonne
 xyz$annee <- as.integer(str_extract(string = xyz$Date, pattern = "[0-9]+"))
 
 ## Exercice: créez une table montrant la distribution des numéros par année
@@ -135,7 +139,7 @@ xyz$annee <- as.integer(str_extract(string = xyz$Date, pattern = "[0-9]+"))
 table(xyz$Numéro)
 
 # Il faut d'abord extraire les nombres (irrégularité dans l'entrée de données)
-# L'argument `pattern` est une expression régulière (extraction de 1 à trois chiffres)
+# L'argument `pattern` est une expression régulière. Pourriez-vous l'expliquer?
 xyz$Numéro <- as.integer(str_extract(xyz$Numéro, pattern = "[0-9]{1,3}"))
 
 # Essayer à nouveau
@@ -175,7 +179,7 @@ str(xyz)
 
 Pour que des lieux physiques puissent être transposés sur une carte géographique, il faut en proposer une représentation qui respecte un ensemble de normes. La norme *Simple Feature Access* est celle que les spécialistes suivent dans la construction, le stockage et le traitement des objets pourvus d'attributs géographiques.
 
-Dans R, l'extension `sf` implémente cette norme *Simple Feature Access*. Ce qu'on appelle *feature* peut être conçu comme un objet du monde réel: un immeuble, une place publique, une ville, un cours d'eau, une forêt, une chaîne de montagnes. Une ville par exemple, selon la perspective (le point dans l'espace depuis lequel on la considère), sera représentée par un point, un polygone ou un ensemble de polygones (si elle est traversée par des cours d'eau). Une rivière prendra généralement la forme d'une série de points formant une ligne brisée, et ainsi de suite. Les points, les polygones, les multipolygones et les lignes sont les principales formes avec lesquels on représente les objets sur une carte. Un objet géoréférencé aura d'autres attributs (population, température moyenne, altitude, etc.). Toutes ces données, géographiques et autres, seront emmagasinées selon la norme SF dans un tableau de données, une structure comportant deux dimensions (avec lignes et colonnes).
+Dans R, l'extension `sf` implémente cette norme *Simple Feature Access* (ou simplement *SF*). Ce qu'on appelle *feature* peut être conçu comme un objet du monde réel: un immeuble, une place publique, une ville, un cours d'eau, une forêt, une chaîne de montagnes. Une ville par exemple, selon la perspective (le point dans l'espace depuis lequel on la considère), sera représentée par un point, un polygone ou un ensemble de polygones (si elle est traversée par des cours d'eau). Une rivière prendra généralement la forme d'une série de points formant une ligne brisée, et ainsi de suite. Les points, les polygones, les multipolygones et les lignes sont les principales formes avec lesquels on représente les objets sur une carte. Un objet géoréférencé aura d'autres attributs (exemple: population, température moyenne, altitude, etc.). Toutes ces données, géographiques et autres, seront emmagasinées selon la norme SF dans un tableau de données, une structure comportant deux dimensions (avec lignes et colonnes).
 
 Dans le bloc suivant, nous allons importer un fichier avec une extension .shp (*shapefile*). Il a été récupéré sur le site de [Données Québec](https://www.donneesquebec.ca/recherche/dataset/vmtl-quartiers-sociologiques) et contient les données géographiques des quartiers sociologiques de Montréal. Nous allons supprimer certaines colonnes sans intérêt immédiat, puis y ajouter une nouvelle colonne appelée `regex` (pour "expression régulière"). Ces expressions régulières permettront ensuite d'associer les noms de quartiers trouvés dans les textes du corpus à des noms de quartier standardisés.
 
@@ -232,7 +236,7 @@ quartiersGeoMtl$regex <- c(
   "[Vv]illeray"
 )
 
-# Test avec Côte-des-Neiges
+# On peut faire un test d'indexation avec avec Côte-des-Neiges (4e expression régulière)
 xyz[texte %like% quartiersGeoMtl$regex[4]]
 
 
@@ -248,14 +252,11 @@ Les expressions régulières permettront de repérer sinon la totalité, du moin
 regex_tous_quartiers <- paste(quartiersGeoMtl$regex, sep = "", collapse = "|")
 
 # Extraction des noms avec cette expression régulière.
-# La fonction `sapply()` permet d'appliquer une fonction en boucle sur un vecteur ou une liste.
+# La fonction `sapply()` permet d'appliquer une fonction en boucle sur un vecteur ou une liste
 xyz[, quartiers_nommes := str_extract_all(texte, pattern = regex_tous_quartiers)]
 
-# Remplacement des character(0) par NA dans la nouvelle colonne du tableau
-xyz$quartiers_nommes <- lapply(xyz$quartiers_nommes, function(x) if(identical(x, character(0))) "" else x)
-
-# Observation du résultat
-xyz[!quartiers_nommes == "character(0)", .(quartiers_nommes)]
+str(xyz)
+xyz$quartiers_nommes[1:10]
 
 # Élimination des doublons
 xyz[, quartiers_nommes:=lapply(quartiers_nommes, unique)]
@@ -279,7 +280,7 @@ xyz$quartiers_nommes <- stri_replace_all_regex(
 
 ### Constitution d'une table pour visualisation
 
-Nous avons maintenant deux tables à notre disposition. La première contient les textes et les métadonnées, ainsi qu'une colonne où sont indiqués les quartiers nommés dans les textes. La deuxième est un un objet de type SF et contient ces mêmes noms de quartiers associés à des coordonnées géographiques. Pour passer à la prochaine étape, soit la projection de la fréquence des mentions de quartiers dans une carte géographique, nous devons créer une troisième table qui contiendra trois informations: le nom du quartier, équivalent ici à un identifiant unique, le nombre de fois que ce quartier est mentionné dans l'ensemble du corpus, et les données géographiques de ces quartiers.
+Nous avons maintenant deux tables à notre disposition. La première contient les textes et les métadonnées, ainsi qu'une colonne où sont indiqués les quartiers nommés dans les textes. La deuxième est un un objet de type SF et contient ces mêmes noms de quartiers associés à des coordonnées géographiques. Pour passer à la prochaine étape, soit la projection de la fréquence des mentions de quartiers dans une carte géographique, nous devons créer une troisième table qui contiendra trois informations: le **nom du quartier**, le **nombre de fois que ce quartier est mentionné dans l'ensemble du corpus**, et les **données géographiques** de ces quartiers.
 
 ```{r}
 
@@ -290,6 +291,7 @@ quartiers_nommes_sep_l <- strsplit(xyz$quartiers_nommes, "; ")
 valeurs_non_nulles <- which(quartiers_nommes_sep_l != "character(0)")
 quartiers_nommes_sep_l <- quartiers_nommes_sep_l[valeurs_non_nulles]
 
+# Extraction des noms emmagasinés dans liste et transposition dans un tableau de données
 quartiers_empiles <- data.table(
   Q_socio = c(
     sapply(quartiers_nommes_sep_l, "[", 1),
@@ -299,16 +301,22 @@ quartiers_empiles <- data.table(
   )
 )
 
+# Calcul de la fréquence des noms de quartiers
 freq_quartiers <- quartiers_empiles[
-  !is.na(Q_socio) , .N, "Q_socio"][
-    order(N, decreasing = TRUE)
-    ]
+  !is.na(Q_socio) , .N, "Q_socio"]
 
+# En base R, la même opération serait faite comme suit:
+quartiers_empiles_sansNA <- quartiers_empiles[!is.na(quartiers_empiles$Q_socio),]
+freq_quartiers_df <- data.frame(Q_socio = names(table(quartiers_empiles_sansNA)),
+                                N = unname(as.integer(table(quartiers_empiles_sansNA))))
+
+# On joint maintenant la table de fréquence et celle contenant les coordonnées géographiques
 freq_quartiers_geo <- left_join(
   quartiersGeoMtl[, c("Q_socio", "geometry")],
   freq_quartiers, by ="Q_socio"
   )
 
+# Cette opération a introduit dans la table de fréquence des noms de quartiers qui n'y étaient pas et dont la fréquence est NA. Nous allons transformer ces NA en 0.
 freq_quartiers_geo$N <- ifelse(
   is.na(freq_quartiers_geo$N),
   0,
@@ -363,7 +371,7 @@ ggplot(freq_quartiers_geo, aes(x=reorder(Q_socio, N), y=N, colour = N, size = N)
 
 ```
 
-Un tel diagramme ne tire cependant pas parti des données géographiques du tableau. L'extension ggplot2 qu'on vient d'utiliser pour créer le diagramme de dispersion permet d'ajouter une couche graphique. La fonction prend en entrée l'objet sf et repère automatiquement la colonne geo contenant les coordonnées de polygones.
+Un tel diagramme ne tire cependant pas parti des données géographiques du tableau. L'extension ggplot2 qu'on vient d'utiliser pour créer le diagramme de dispersion permet d'ajouter une couche graphique. La fonction prend en entrée l'objet `sf` et repère automatiquement la colonne `geo` contenant les coordonnées de polygones.
 
 ```{r}
 
@@ -371,17 +379,18 @@ ggplot()+
   geom_sf(data=freq_quartiers_geo, aes(fill=-N))
 ```
 
-Dans la suite de l'atelier, on utilisera des extensions spécialisées.
+Dans la suite de l'atelier, on utilisera plutôt des extensions spécialisées.
 
 ### Projection des dimensions dans l'espace géogrpahique
 
-Plusieurs extensions permettent d'utiliser les données géographiques pour produire des cartes statiques et interactives. Leaflet et tmap sont parmi les plus utilisées. D'autres, comme mapview, s'appuient sur leaflet et simplifient le processus. Vous trouverez en ligne une documentation abondante et plusieurs exemples avec différents jeux de données
+Plusieurs extensions permettent d'utiliser les données géographiques pour produire des cartes statiques et interactives. Leaflet et tmap sont parmi les plus utilisées. D'autres, comme mapview, s'appuient sur leaflet et simplifient le processus. Vous trouverez en ligne une documentation abondante et plusieurs exemples avec divers jeux de données
 
 ### L'extension tmap
 
 L'extension tmap fonctionne sur le principe de la grammaire des graphiques dont il a été question dans le précédent atelier sur ggplot2. On fournit à la fonction d'entrée `tm_shape()` un jeu de données et on ajoute ensuite des couches pour ajuster les formes et autres éléments tels les titres, symboles, légendes, etc.
 
 ```{r}
+tmap_mode("plot")
 
 # Fonction de base, à laquelle on ajoute les polygones
 tm_shape(freq_quartiers_geo) + tm_polygons(col = "N",  palette = "viridis")
@@ -402,27 +411,34 @@ freq_shape <- tm_shape(freq_quartiers_geo) + tm_polygons(col = "N", style = "cat
 freq_shape + tm_compass(type = "8star", position = c("left", "top"))
   
 # Ajout d'un titre
-freq_shape + tm_layout(title = "Quartiers montréalais")
+freq_shape + tm_layout(title = "Quartiers montréalais dans les nouvelles\nde la revue XYZ")
 
 # Taille des éléments
-freq_shape + tm_layout(title = "Quartiers montréalais", title.size = 0.8)
+freq_shape + tm_layout(title = "Quartiers montréalais dans les nouvelles\nde la revue XYZ", title.size = 0.8)
 
 # Couleur de l'arrière-plan
-freq_shape + tm_layout(title = "Quartiers montréalais", bg.color = "grey85")
+freq_shape + tm_layout(title = "Quartiers montréalais dans les nouvelles\nde la revue XYZ", title.size = 0.8, bg.color = "grey85")
 
 # Élimination du cadre
-freq_shape + tm_layout(title = "Quartiers montréalais", frame = FALSE)
+freq_shape + tm_layout(title = "Quartiers montréalais dans les nouvelles\nde la revue XYZ", title.size = 0.8, frame = FALSE)
 
 # Ajout d'un titre et des crédits, puis déplacement de la légende
-freq_shape + tm_layout(title = "Quartiers montréalais", scale = 0.7, frame = FALSE) +
-  tm_credits("Revue d'essais littéraires XYZ", position = c("right", "BOTTOM"))
+freq_shape + tm_layout(title = "Quartiers montréalais dans les nouvelles\nde la revue XYZ", scale = 0.7, frame = FALSE) +
+  tm_credits("Source des données: XYZ", position = c("right", "BOTTOM"))
 
 
 # Utilisation d'une feuille de styles
-freq_shape + tm_style("bw")
-freq_shape + tm_style("classic")
-freq_shape + tm_style("cobalt")
-freq_shape + tm_style("col_blind")
+tm_shape(freq_quartiers_geo) + tm_polygons(col = "N") + tm_style("bw")
+tm_shape(freq_quartiers_geo) + tm_polygons(col = "N") + tm_style("classic")
+tm_shape(freq_quartiers_geo) + tm_polygons(col = "N") + tm_style("cobalt")
+tm_shape(freq_quartiers_geo) + tm_polygons(col = "N") + tm_style("col_blind")
+
+# Ajout des noms de quartiers (ici, on aurait pu conserver et utiliser les codes de quartiers pour éviter les superpositions)
+tm_shape(freq_quartiers_geo) + tm_polygons(col = "N") + 
+  tm_style("col_blind") +
+  tm_text("Q_socio", size = 0.4)
+
+
 ```
 
 ## Deuxième tâche
@@ -493,15 +509,15 @@ freq_univ$adresse <- c("3150, rue Jean-Brillant, Montreal, Quebec, Canada",
 
 ## Travailler avec Tidygeocoder
 
-Nous sommes maintenant prêts à géoréférencer nos données. Les adresses seront passées à la fonction `geocode()` de l'extension tidygeocoder. Celle-ci traduit nos requêtes, écrites en langage R, dans un format que l'API puisse interpréter (normalement json). La réponse de l'API, une fois reçue par tidygeocoder, est transformée en un tableau de données de type `tibble`. Si vos adresses ne sont pas déjà intégrées à un tableau de données, vous pouvez les passer sous la forme d'un vecteur à la fonction `geo()`. Essayez par exemple avec une adresse que vous connaissez bien.
+Nous sommes maintenant prêts à géoréférencer nos données. Les adresses seront passées à la fonction `geocode()` de l'extension tidygeocoder. Celle-ci traduit nos requêtes, écrites en langage R, dans un format que l'API puisse interpréter (normalement json). La réponse de l'API, une fois reçue par tidygeocoder, est transformée en un tableau de données de type `tibble`. Si vos adresses ne sont pas déjà intégrées à un tableau de données, vous pouvez les passer sous la forme d'un vecteur à la fonction `tidygeocoder::geo()`. Essayez par exemple avec une adresse que vous connaissez bien.
 
 ```{r}
 
-# Exercice: remplacer l'adresse dans la l'instruction ci-dessous par une adresse de votre choix, puis observez le résultat.
+# Exercice: remplacer l'adresse dans l'instruction ci-dessous par une adresse de votre choix, puis observez le résultat.
 mon_adresse <- geo(address = "1000, rue de la Gauchetière, Montréal, Québec, Canada")
 ```
 
-Comme nos adresses sont dans un tableau de données, nous allons utiliser la fonction `geocode()`. Nous allons ensuite transformer le tableau de données en un objet de type Simple Feature.
+Comme nos adresses sont dans un tableau de données, nous allons utiliser la fonction `geocode()`. Nous allons ensuite transformer le tableau de données en un objet de type *Simple Feature*.
 
 ```{r}
 # Géoréférencement des universités montréalaises
@@ -534,17 +550,32 @@ tmap_mode("view")
 tm_shape(mtl_poly) + tm_polygons() +
 tm_shape(freq_univ_geo_sf) + tm_bubbles(size = "N", col = "red")
 
+# Le mode "view" permet d'utiliser des couches de base variées:
 tmap_mode("view")
-(mtl_univ_plot <- tm_basemap(server = "Stamen.TonerLite") + 
+# Modification de paramètres
+tm_basemap(server = "Stamen.Toner") + 
+tm_shape(mtl_poly) + tm_polygons(col="white", border.col = "blue") +
+tm_shape(freq_univ_geo_sf) + tm_bubbles(size = "N", col = "red", scale = 3)
+
+# Le mode "plot" permet de d'ajouter d'autres éléments visuels
+tmap_mode("plot")
 tm_shape(mtl_poly) + tm_polygons(col="white", border.col = "blue") +
 tm_shape(freq_univ_geo_sf) + tm_bubbles(size = "N", col = "red", scale = 3)+
-# tm_text(text = "nom_univ", size = 0.5)+
+tm_text(text = "nom_univ", size = 0.5)+
 tm_credits("Source des données: Revue XYZ") + 
 tm_layout(main.title = "Universités montréalaises dans\nles nouvelles de la revue XYZ",
             fontface = "bold",
-          title.size = 0.5))
+          title.size = 0.5)
 
 # Fonction de sauvegarde
+mtl_univ_plot <- tm_shape(mtl_poly) + tm_polygons(col="white", border.col = "blue") +
+tm_shape(freq_univ_geo_sf) + tm_bubbles(size = "N", col = "red", scale = 3)+
+tm_text(text = "nom_univ", size = 0.5)+
+tm_credits("Source des données: Revue XYZ") + 
+tm_layout(main.title = "Universités montréalaises dans\nles nouvelles de la revue XYZ",
+            fontface = "bold",
+          title.size = 0.5)
+
 tmap_save(
   tm = mtl_univ_plot,
   filename = "donnees/donnees_produites/graphiques/mtl_univ_plot.png"
