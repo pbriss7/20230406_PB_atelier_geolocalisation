@@ -118,9 +118,6 @@ xyz$doc_id <-
 # Vérifier que les doc_id sont uniques
 table(!duplicated(xyz$doc_id))
 
-# Autre manière de faire cette vérification:
-identical(length(xyz$doc_id), nrow(xyz))
-
 # Exercice: pouvez-vous expliquer l'instruction ci-dessus?
 
 # Observer à nouveau la structure
