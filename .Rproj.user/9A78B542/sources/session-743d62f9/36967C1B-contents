@@ -40,9 +40,9 @@ L'objectif de l'atelier n'est pas d'ajouter à cette documentation abondante et 
 
 ### Objectifs:
 
--   repérer dans des textes des objets du monde réel qui puissent être géolocalisé (sous forme de polygones et sous forme de points), puis extraire les chaînes de caractères représentant ces objets;
+-   repérer dans des textes des objets du monde réel qui puissent être géolocalisés (sous forme de polygones et sous forme de points), puis extraire les chaînes de caractères représentant ces objets;
 
--   obtenir par croisement de tables les coordonnées géographiques de ces objets;
+-   obtenir par croisement de tables et par API (tidygeocoder) les coordonnées géographiques de ces objets;
 
 -   projeter le résultat sur une carte.
 
@@ -50,11 +50,11 @@ Nous allons essayer d'atteindre ces objectifs à travers deux tâches plus préc
 
 #### Première tâche
 
-La première tâche sera consistera à extraire de données textuelles les noms de quartiers de Montréal et à projeter ensuite sur une carte géographique ces mêmes quartiers, sous forme de polygones. Une échelle de couleur sera établie pour traduire la fréquence d'apparition des noms de quartiers dans l'ensemble du corpus.
+La première tâche consistera à extraire de textes de fictions les noms de quartiers de Montréal et à projeter ensuite sur une carte géographique ces mêmes quartiers sous forme de polygones. Une échelle de couleurs sera établie pour traduire la fréquence d'apparition des noms de quartiers dans l'ensemble du corpus.
 
 #### Deuxième tâche
 
-La deuxième tâche sera de géoréférencer, à l'aide de l'extension tidygeocoder, les universités montréalaises et de projeter sur la quarte des quartiers des points dont la taille correspondra à une échelle de fréquence.
+La deuxième tâche consistera à extraire du même corpus les mentions des universités montréalaises, à géoréférencer ces universitiés avec tidygeocoder, puis à projeter sur une carte géographique les points correspondant à ces entités géographiques.
 
 ## Installation et activation des extensions
 
