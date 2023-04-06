@@ -1,6 +1,6 @@
 ---
 title: "Géolocalisation de données textuelles"
-author: "Pascal Brissette et Lisa Teichmann"
+author: "Pascal Brissette"
 format: html
 editor: visual
 editor_options: 
