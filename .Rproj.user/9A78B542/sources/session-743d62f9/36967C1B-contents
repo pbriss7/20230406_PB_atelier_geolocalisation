@@ -30,7 +30,7 @@ mapview(geo["CATEGORIE"])
 
 ```
 
-On arrive, avec très peu de moyens, à produire grâce à l'extension mapview, une carte interactive d'une très grande qualité.
+On arrive, avec très peu de moyens, à produire grâce à l'extension mapview une carte interactive d'une très grande qualité.
 
 Il faut dire que R possède des extensions très puissantes et de très grande qualité, développées, soutenues et utilisées par les géographes.
 
@@ -174,9 +174,9 @@ str(xyz)
 
 Pour que des lieux physiques puissent être transposés sur une carte géographique, il faut en proposer une représentation qui respecte un ensemble de normes. La norme *Simple Feature Access* est celle que les spécialistes suivent dans la construction, le stockage et le traitement des objets pourvus d'attributs géographiques.
 
-Dans R, l'extension `sf` implémente cette norme *Simple Feature Access*. Ce qu'on appelle *feature* peut être conçu comme un objet du monde réel: un immeuble, une place publique, une ville, un cours d'eau, une forêt, une chaîne de montagnes. Selon la perspective, une ville sera représentée par un point ou un polygone. Un cours d'eau prendra généralement la forme d'une série de points formant une ligne brisée. Lorsqu'on géoréférence une municipalité ou un quartier, on obtiendra parfois un point correspondant aux coordonnées géographiques de l'hôtel de ville ou à son centre absolu, parfois un polygone. L'objet géoréférencé aura d'autres attributs (population, température moyenne, altitude, etc.). Toutes ces données, géographiques et autres, seront emmagasinées selon la norme SF dans un tableau de données, donc une structure de données en deux dimensions (*i* lignes et *j* colonnes).
+Dans R, l'extension `sf` implémente cette norme *Simple Feature Access*. Ce qu'on appelle *feature* peut être conçu comme un objet du monde réel: un immeuble, une place publique, une ville, un cours d'eau, une forêt, une chaîne de montagnes. Une ville par exemple, selon la perspective (le point dans l'espace depuis lequel on la considère), sera représentée par un point, un polygone ou un ensemble de polygones (si elle est traversée par des cours d'eau). Une rivière prendra généralement la forme d'une série de points formant une ligne brisée, et ainsi de suite. Les points, les polygones, les multipolygones et les lignes sont les principales formes avec lesquels on représente les objets sur une carte. Un objet géoréférencé aura d'autres attributs (population, température moyenne, altitude, etc.). Toutes ces données, géographiques et autres, seront emmagasinées selon la norme SF dans un tableau de données, une structure comportant deux dimensions (avec lignes et colonnes).
 
-Dans le bloc suivant, nous allons importer un fichier avec une extension .shp (*shapefile*). Il a été récupéré sur le site de Données Québec et contient les données géographiques des quartiers sociologiques de Montréal. Nous allons supprimer certaines colonnes sans intérêt immédiat, puis y ajouter une nouvelle colonne appelée `regex` (pour "expression régulière"). Ces expressions régulières permettront ensuite d'associer les noms de quartiers trouvés dans les textes du corpus à des noms de quartier standardisés.
+Dans le bloc suivant, nous allons importer un fichier avec une extension .shp (*shapefile*). Il a été récupéré sur le site de [Données Québec](https://www.donneesquebec.ca/recherche/dataset/vmtl-quartiers-sociologiques) et contient les données géographiques des quartiers sociologiques de Montréal. Nous allons supprimer certaines colonnes sans intérêt immédiat, puis y ajouter une nouvelle colonne appelée `regex` (pour "expression régulière"). Ces expressions régulières permettront ensuite d'associer les noms de quartiers trouvés dans les textes du corpus à des noms de quartier standardisés.
 
 ```{r}
 # Importation d'une table comprenant les noms de quartiers et les coordonnées correspondant à leurs délimitations
