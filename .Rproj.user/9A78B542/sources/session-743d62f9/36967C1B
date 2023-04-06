@@ -1,0 +1,33 @@
+{
+    "id": "36967C1B",
+    "path": "~/github/PERSONNEL/Ateliers/202303_PB_LT_atelier_ladirec_geo/code.qmd",
+    "project_path": "code.qmd",
+    "type": "quarto_markdown",
+    "hash": "1139829492",
+    "contents": "",
+    "dirty": false,
+    "created": 1678470218895.0,
+    "source_on_save": false,
+    "relative_order": 1,
+    "properties": {
+        "rmdVisualMode": "true",
+        "rmdVisualWrapConfigured": "true",
+        "tempName": "Untitled1",
+        "source_window_id": "",
+        "Source": "Source",
+        "cursorPosition": "552,0",
+        "scrollLine": "0",
+        "docOutlineVisible": "0",
+        "rmdVisualCollapsedChunks": "",
+        "rmdVisualModeLocation": "23578:12869.0908203125",
+        "chunk_output_type": "console"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1680749674,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1680749674548,
+    "read_only": false,
+    "read_only_alternatives": []
+}
