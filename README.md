@@ -9,7 +9,7 @@ Le répertoire contient le matériel utilisé lors d'un atelier d'introduction a
 * `actes_criminels_mtl.csv`: un jeu de données provenant de Données Québec: https://www.donneesquebec.ca/recherche/dataset/vmtl-actes-criminels;
 * `quartiersMtl.csv`: un jeu de données provenant de Données Québec: https://www.donneesquebec.ca/recherche/dataset/vmtl-quartiers-sociologiques
 
-L’autorisation d’utiliser les données textuelles dans le cadre d’ateliers de fouille a été accordée par la direction de la revue XYZ. Les textes ont été moissonnés sur le site Érudit (https://www.erudit.org/fr/revues/xyz/) par l’équipe du LADIREC (Amélie Ducharme et Yu Chen Shi, sous la supervision de Julien Vallières-Gingras).
+L’autorisation d’utiliser les données textuelles dans le cadre d’ateliers de fouille a été accordée par la direction de la revue XYZ. Les textes ont été moissonnés sur le site Érudit (https://www.erudit.org/fr/revues/xyz/) par Amélie Ducharme et Yu Chen Shi, sous la supervision de Julien Vallières-Gingras.
 
 Une fois le dossier importé et décompressé, il faut ouvrir le fichier 20230406_PB_atelier_ladirec_geo.Rproj pour activer le projet et faire en sorte que les chemins relatifs conduisent aux fichiers.
 
