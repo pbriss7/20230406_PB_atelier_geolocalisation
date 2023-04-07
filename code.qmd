@@ -90,6 +90,7 @@ extensions <-
     "mapview"
   )
 
+# Application de la fonction à chaque élément du vecteur `extensions`
 sapply(extensions, inst_ext_fun)
 
 ```
