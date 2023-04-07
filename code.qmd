@@ -9,9 +9,11 @@ editor_options:
 
 # Introduction
 
-Produire une carte à partir d'un jeu de données trouvé en ligne est généralement une opération assez simple. Quelques lignes de code peuvent parfois suffire, comme le montre l'exemple ci-dessous mettant à profit un jeu de données sur les crimes commis sur le territoire montréalais (l'importation du jeu de données peut prendre jusqu'à quelques minutes, selon la vitesse de votre connexion internet) :
+Produire une carte à partir d'un jeu de données trouvé en ligne est désormais une opération assez simple. Quelques lignes de code peuvent peuvent suffire, comme le montre l'exemple ci-dessous mettant à profit un jeu de données sur les crimes commis sur le territoire montréalais (l'importation du jeu de données peut prendre plusieurs secondes, selon la vitesse de votre connexion internet) :
 
 ```{r}
+#| include: false
+
 if(!"geojsonsf" %in% rownames(installed.packages())) {install.packages("geojsonsf")}
 if(!"dplyr" %in% rownames(installed.packages())) {install.packages("dplyr")}
 if(!"mapview" %in% rownames(installed.packages())) {install.packages("mapview")}
@@ -33,11 +35,9 @@ mapview(geo["CATEGORIE"])
 
 On arrive, avec très peu de moyens, à produire grâce à l'extension mapview une carte interactive d'une très grande qualité.
 
-Il faut dire que R possède des extensions de grande qualité développées, soutenues et utilisées par les géographes.
+Il faut dire que R possède des extensions de grande qualité développées, soutenues et utilisées par les géographes. Si vous possédez un jeu de données qui comporte les coordonnées géographiques d'objets du monde réel et que ce jeu répond aux standards *Simple Feature Access* (*SF*), le passage vers la représentation cartographique sera pratiquement un jeu d'enfant. Vous trouverez en ligne quantité de cours et de tutoriels qui vous montreront à utiliser les fonctions de l'une ou l'autre des extentions spécialisées.
 
-Si vous possédez un jeu de données qui comporte les coordonnées géographiques d'objets du monde réel et que ce jeu répond aux standards *Simple Feature Access* (*SF*), le passage vers la représentation cartographique sera pratiquement un jeu d'enfant. Vous trouverez en ligne quantité de cours et de tutoriels qui vous montreront à utiliser les fonctions de l'une ou l'autre des extentions spécialisées.
-
-L'objectif de l'atelier n'est pas d'ajouter à cette documentation abondante et dans plusieurs cas de grande qualité. Plutôt, il **vise à faire le pont entre l'analyse des données textuelles et les extensions spécialisées**. Même si l'exercice débouchera, deux fois plutôt qu'une, sur la création de cartes géographiques, on veut prendre le problème en amont de l'exercice cartographique en proposant une chaîne de traitement possible pour passer des données textuelles aux cartes géographiques.
+L'objectif de l'atelier n'est pas d'ajouter à cette documentation abondante. Plutôt, il **vise à faire le pont entre l'analyse des données textuelles et les extensions spécialisées**. Même si l'exercice débouchera, deux fois plutôt qu'une, sur la création de cartes géographiques, on veut prendre le problème en amont de l'exercice cartographique en proposant une chaîne de traitement possible pour passer des données textuelles aux cartes géographiques.
 
 ### Objectifs:
 
@@ -65,12 +65,11 @@ Il convient d'abord de préparer l'environnement de travail. La fonction ci-dess
 
 # Création d'une fonction d'installation et d'activation des extensions
 inst_ext_fun <- function(extension) {
-  uneExtension <-
-    extension[!(extension %in% rownames(installed.packages()))]
-  if (length(uneExtension))
-    install.packages(uneExtension, dependencies = TRUE)
-  sapply(extension, require, character.only = TRUE)
-}
+  if(!extension %in% rownames(installed.packages())) {
+    install.packages(extension, dependencies = TRUE)
+    }
+  require(extension, character.only = TRUE)
+  }
 
 # usage
 extensions <-
@@ -81,14 +80,17 @@ extensions <-
     "data.table",
     "tidygeocoder",
     "sf",
+    "dplyr",
     "stringi",
     "stringr",
     "tmap",
     "tmaptools",
-    "viridis"
+    "viridis",
+    "geojsonsf",
+    "mapview"
   )
 
-inst_ext_fun(extensions)
+sapply(extensions, inst_ext_fun)
 
 ```
 
@@ -96,13 +98,13 @@ inst_ext_fun(extensions)
 
 ## Importation et préparation des données
 
-Le jeu de données que nous allons utiliser est celui qui a été exploré dans les précédents ateliers. Il s'agit d'un tableau de données (*data frame*) contenant 563 nouvelles littéraires publiées dans [XYZ: la revue de la nouvelle](https://www.erudit.org/fr/revues/xyz/) entre 2012 et 2022. Les textes ont été moissonnés sur le site [Érudit](https://www.erudit.org/fr/revues/xyz/) par l'équipe du LADIREC (Amélie Ducharme et Yu Chen Shi, sous la supervision de Julien Vallières-Gingras).
+Le jeu de données que nous allons utiliser est celui qui a été exploré dans les précédents ateliers. Il s'agit d'un tableau de données (*data frame*) contenant 563 nouvelles littéraires publiées dans [XYZ: la revue de la nouvelle](https://www.erudit.org/fr/revues/xyz/) entre 2012 et 2022. Les textes ont été moissonnés sur le site [Érudit](https://www.erudit.org/fr/revues/xyz/) par Amélie Ducharme et Yu Chen Shi, sous la supervision de Julien Vallières-Gingras.
 
 ```{r}
 
 # Lecture du jeu de données
 xyz <-
-  data.table::fread("donnees/donnees_importees/combined_table_xyz.csv")
+  data.table::fread("donnees/donnees_importees/xyz.csv")
 
 # Observer la structure
 str(xyz)
@@ -117,8 +119,6 @@ xyz$doc_id <-
 
 # Vérifier que les doc_id sont uniques
 table(!duplicated(xyz$doc_id))
-
-# Exercice: pouvez-vous expliquer l'instruction ci-dessus?
 
 # Observer à nouveau la structure
 str(xyz)
@@ -189,7 +189,7 @@ print(quartiersGeoMtl)
 str(quartiersGeoMtl)
 
 # Sélection des colonnes d'intérêt
-quartiersGeoMtl <- quartiersGeoMtl[, c("Q_socio", "geometry")]
+quartiersGeoMtl <- quartiersGeoMtl[, c("Q_socio", "Abrev", "geometry")]
 
 # Observation de cette structure de données
 str(quartiersGeoMtl)
@@ -245,24 +245,22 @@ Les expressions régulières permettront de repérer sinon la totalité, du moin
 # Première étape: créer une seule et longue regex avec celles de la colonne du même nom
 regex_tous_quartiers <- paste(quartiersGeoMtl$regex, sep = "", collapse = "|")
 
-# Extraction des noms avec cette expression régulière.
-# La fonction `sapply()` permet d'appliquer une fonction en boucle sur un vecteur ou une liste
-xyz[, quartiers_nommes := str_extract_all(texte, pattern = regex_tous_quartiers)]
+# Extraction des noms avec cette expression régulière. Les chaînes ainsi extraites seront placées dans une nouvelle colonne appelée "quartiers_nommes".
+xyz$quartiers_nommes <- sapply(xyz$texte, str_extract_all, pattern = regex_tous_quartiers)
 
 str(xyz)
-xyz$quartiers_nommes[1:10]
 
 # Élimination des doublons
-xyz[, quartiers_nommes:=lapply(quartiers_nommes, unique)]
+xyz$quartiers_nommes <- sapply(xyz$quartiers_nommes, unique)
 
 # L'opération d'extraction a généré des listes. 
 # On peut assembler les éléments de ces listes avec `paste()`
-xyz$quartiers_nommes <- sapply(xyz$quartiers_nommes, function(x) paste(x, collapse = "; "))
+xyz$quartiers_nommes <- sapply(xyz$quartiers_nommes, paste, collapse = "; ")
 
-# Vérification de l'opération
+# Vérification du succès de l'opération
 xyz[quartiers_nommes != "", .(quartiers_nommes)]
 
-# Conversion des formes extraites des textes en noms officiels 
+# Conversion des chaines extraites des textes en noms officiels 
 xyz$quartiers_nommes <- stri_replace_all_regex(
     xyz$quartiers_nommes,
     pattern = quartiersGeoMtl$regex,
@@ -285,7 +283,7 @@ quartiers_nommes_sep_l <- strsplit(xyz$quartiers_nommes, "; ")
 valeurs_non_nulles <- which(quartiers_nommes_sep_l != "character(0)")
 quartiers_nommes_sep_l <- quartiers_nommes_sep_l[valeurs_non_nulles]
 
-# Extraction des noms emmagasinés dans liste et transposition dans un tableau de données
+# Extraction des noms emmagasinés dans la liste et transfert de ces noms dans un tableau de données
 quartiers_empiles <- data.table(
   Q_socio = c(
     sapply(quartiers_nommes_sep_l, "[", 1),
@@ -296,17 +294,16 @@ quartiers_empiles <- data.table(
 )
 
 # Calcul de la fréquence des noms de quartiers
-freq_quartiers <- quartiers_empiles[
-  !is.na(Q_socio) , .N, "Q_socio"]
+freq_quartiers <- quartiers_empiles[!is.na(Q_socio) , .N, "Q_socio"]
 
 # En base R, la même opération serait faite comme suit:
-quartiers_empiles_sansNA <- quartiers_empiles[!is.na(quartiers_empiles$Q_socio),]
-freq_quartiers_df <- data.frame(Q_socio = names(table(quartiers_empiles_sansNA)),
-                                N = unname(as.integer(table(quartiers_empiles_sansNA))))
+# quartiers_empiles_sansNA <- quartiers_empiles[!is.na(quartiers_empiles$Q_socio),]
+# freq_quartiers_df <- data.frame(Q_socio = names(table(quartiers_empiles_sansNA)),
+#                                N = unname(as.integer(table(quartiers_empiles_sansNA))))
 
 # On joint maintenant la table de fréquence et celle contenant les coordonnées géographiques
 freq_quartiers_geo <- left_join(
-  quartiersGeoMtl[, c("Q_socio", "geometry")],
+  quartiersGeoMtl[, c("Q_socio", "Abrev", "geometry")],
   freq_quartiers, by ="Q_socio"
   )
 
@@ -316,39 +313,6 @@ freq_quartiers_geo$N <- ifelse(
   0,
   freq_quartiers_geo$N
   )
-
-#### Autre façon de faire, un peu plus complexe, si on souhaite accorder dans le tableau principal du corpus une colonne pour chacun des noms de quartiers. ####
-
-# Extraction de ces noms, désormais séparés, avec leur insertion dans des colonnes distinctes du tableaux xyz.
-# xyz[, `:=`(quartier1=ifelse(sapply(quartiers_nommes_sep_l, "[", 1) != "",
-#                             sapply(quartiers_nommes_sep_l, "[", 1), NA),
-#            quartier2=ifelse(!is.na(sapply(quartiers_nommes_sep_l, "[", 2)),
-#                             sapply(quartiers_nommes_sep_l, "[", 2), NA),
-#            quartier3=ifelse(!is.na(sapply(quartiers_nommes_sep_l, "[", 3)),
-#                             sapply(quartiers_nommes_sep_l, "[", 3), NA),
-#            quartier4=ifelse(!is.na(sapply(quartiers_nommes_sep_l, "[", 4)),
-#                             sapply(quartiers_nommes_sep_l, "[", 4), NA))]
-# 
-# # Comme on l'a fait dans le dernier atelier avec les prétendants de Maria Chapdelaine, nous allons maintenant créer une table où le nom des colonnes correspondant aux quartiers 1, 2, 3 et 4 deviennent des variables.
-# quartiers_empiles <- melt(xyz, 
-#                           id.vars="doc_id",
-#                           measure.vars = c("quartier1", "quartier2", "quartier3", "quartier4"),
-#                           value.name = "Q_socio")
-# 
-# # On élimine les observations sans contenu.
-# quartiers_empiles_melt <- quartiers_empiles[!is.na(Q_socio)]
-# 
-# # On peut maintenant calculer la fréquence (N) des noms de quartiers.
-# freq_quartiers <- quartiers_empiles_melt[, .N, by = .(Q_socio)]
-# 
-# # On croise cette table avec celle contenant les polygones
-# freq_quartiers_geo <- merge.data.table(freq_quartiers, quartiersGeoMtl[, c("Q_socio", "geometry")], by="Q_socio", all.y = TRUE)
-# 
-# # Remplacement des NA par 0
-# freq_quartiers_geo[, N:=ifelse(is.na(N), 0, N)]
-# 
-# # On ordonne cette table en prenant comme clé la fréquence N
-# freq_quartiers_geo_sorted <- freq_quartiers_geo[order(N, decreasing = TRUE)]
 
 ```
 
@@ -375,7 +339,7 @@ ggplot()+
 
 Dans la suite de l'atelier, on utilisera plutôt des extensions spécialisées.
 
-### Projection des dimensions dans l'espace géogrpahique
+### Projection des dimensions dans l'espace géographique
 
 Plusieurs extensions permettent d'utiliser les données géographiques pour produire des cartes statiques et interactives. Leaflet et tmap sont parmi les plus utilisées. D'autres, comme mapview, s'appuient sur leaflet et simplifient le processus. Vous trouverez en ligne une documentation abondante et plusieurs exemples avec divers jeux de données
 
@@ -432,10 +396,10 @@ tm_shape(freq_quartiers_geo) + tm_polygons(col = "N") + tm_style("classic")
 tm_shape(freq_quartiers_geo) + tm_polygons(col = "N") + tm_style("cobalt")
 tm_shape(freq_quartiers_geo) + tm_polygons(col = "N") + tm_style("col_blind")
 
-# Ajout des noms de quartiers (ici, on aurait pu conserver et utiliser les codes de quartiers pour éviter les superpositions)
+# Ajout des abréviations de quartiers (ici, on aurait pu conserver et utiliser les codes de quartiers pour éviter les superpositions)
 tm_shape(freq_quartiers_geo) + tm_polygons(col = "N") + 
   tm_style("col_blind") +
-  tm_text("Q_socio", size = 0.4)
+  tm_text("Abrev", size = 0.4)
 
 
 ```
@@ -525,6 +489,8 @@ freq_univ_geo <- freq_univ |> tidygeocoder::geocode(address = adresse, method = 
 # Transformation du tableau de données en objet Simple Feature
 freq_univ_geo_sf <- st_as_sf(freq_univ_geo, coords = c("long", "lat"), crs = st_crs(4326))
 
+# Création d'une colonne avec des abréviations
+freq_univ_geo_sf$Abrev <- c("UdeM", "UQAM", "McGill", "Concordia")
 # Si le géoréférencement échoue, vous pouvez exécuter l'instruction ci-dessous
 # freq_univ_geo_sf <- readRDS("donnees/donnees_produites/rds/freq_univ_geo_sf.RDS")
 ```
@@ -563,7 +529,7 @@ tm_shape(freq_univ_geo_sf) + tm_bubbles(size = "N", col = "red", scale = 3)
 tmap_mode("plot")
 tm_shape(mtl_poly) + tm_polygons(col="white", border.col = "blue") +
 tm_shape(freq_univ_geo_sf) + tm_bubbles(size = "N", col = "red", scale = 3)+
-tm_text(text = "nom_univ", size = 0.5)+
+tm_text(text = "Abrev", size = 0.5)+
 tm_credits("Source des données: Revue XYZ") + 
 tm_layout(main.title = "Universités montréalaises dans\nles nouvelles de la revue XYZ",
             fontface = "bold",
