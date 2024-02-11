@@ -211,7 +211,7 @@ quartiersGeoMtl$regex <- c(
   "[Mm]ercier.[Oo]uest",
   "[Mm]ercier.[Ee]st",
   "[Mm]ontréal.[Nn]ord",
-  "[Oo]tremont",
+  "[Oo]utremont",
   "([Pp]lateau.[Mm]ont.[Rr]oyal)|le Plateau",
   "[Pp]ointe.aux.[Tt]rembles",
   "[Rr]ivière.des.[Pp]rairies",
