@@ -9,7 +9,7 @@ editor_options:
 
 # Introduction
 
-Produire une carte à partir d'un jeu de données trouvé en ligne est désormais une opération assez simple. Quelques lignes de code peuvent peuvent suffire, comme le montre l'exemple ci-dessous mettant à profit un jeu de données sur les crimes commis sur le territoire montréalais (l'importation du jeu de données peut prendre plusieurs secondes, selon la vitesse de votre connexion internet) :
+Produire une carte à partir d'un jeu de données trouvé en ligne est désormais une opération assez simple. Quelques lignes de code peuvent suffire, comme le montre l'exemple ci-dessous mettant à profit un jeu de données sur les crimes commis sur le territoire montréalais (l'importation des données peut prendre plusieurs secondes, selon la vitesse de votre connexion internet) :
 
 ```{r}
 #| echo: true
@@ -33,9 +33,9 @@ mapview(geo["CATEGORIE"])
 
 ```
 
-On arrive, avec très peu de moyens, à produire grâce à l'extension mapview une carte interactive d'une très grande qualité.
+On arrive ainsi, avec peu de moyens, à produire grâce à l'extension mapview une carte interactive d'une très grande qualité.
 
-Il faut dire que R possède des extensions de grande qualité développées, soutenues et utilisées par les géographes. Si vous possédez un jeu de données qui comporte les coordonnées géographiques d'objets du monde réel et que ce jeu répond aux standards *Simple Feature Access* (*SF*), le passage vers la représentation cartographique sera pratiquement un jeu d'enfant. Vous trouverez en ligne quantité de cours et de tutoriels qui vous montreront à utiliser les fonctions de l'une ou l'autre des extentions spécialisées.
+Il faut dire que R possède des extensions de grande qualité développées, soutenues et utilisées par les géographes. Si vous possédez un jeu de données qui comporte les coordonnées géographiques d'objets du monde réel et que ce jeu répond aux standards *Simple Feature Access* (*SF*), le passage vers la représentation cartographique sera pratiquement un jeu d'enfant. Vous trouverez en ligne quantité de cours et d'ateliers qui vous montreront à utiliser les fonctions de l'une ou l'autre des extensions spécialisées.
 
 L'objectif de l'atelier n'est pas d'ajouter à cette documentation abondante. Plutôt, il **vise à faire le pont entre l'analyse des données textuelles et les extensions spécialisées**. Même si l'exercice débouchera, deux fois plutôt qu'une, sur la création de cartes géographiques, on veut prendre le problème en amont de l'exercice cartographique en proposant une chaîne de traitement possible pour passer des données textuelles aux cartes géographiques.
 
@@ -45,17 +45,17 @@ L'objectif de l'atelier n'est pas d'ajouter à cette documentation abondante. Pl
 
 -   obtenir par croisement de tables et par API (tidygeocoder) les coordonnées géographiques de ces objets;
 
--   projeter les résultats sur des carte.
+-   projeter les résultats sur des cartes.
 
 Nous allons essayer d'atteindre ces objectifs à travers deux tâches plus précises.
 
 #### Première tâche
 
-La première tâche consistera à extraire de textes de fictions les noms de quartiers de Montréal et à projeter ensuite sur une carte géographique ces mêmes quartiers sous forme de polygones. Une échelle de couleurs sera établie pour traduire la fréquence d'apparition des noms de quartiers dans l'ensemble du corpus.
+La première tâche consistera à extraire de textes de fictions les noms de quartiers de Montréal et à projeter ensuite sur une carte géographique ces mêmes quartiers sous forme de polygones. Une échelle de couleurs sera établie pour traduire la fréquence d'apparition des noms de quartiers dans l'ensemble de la collection de textes.
 
 #### Deuxième tâche
 
-La deuxième tâche consistera à extraire du même corpus les mentions des universités montréalaises, à géoréférencer ces universitiés avec tidygeocoder, puis à projeter sur une carte géographique les points correspondant à ces objets.
+La deuxième tâche consistera à extraire des mêmes textes les mentions des universités montréalaises, à géoréférencer ces universités avec tidygeocoder, puis à projeter sur une carte géographique les points correspondant à ces objets.
 
 ## Installation et activation des extensions
 
